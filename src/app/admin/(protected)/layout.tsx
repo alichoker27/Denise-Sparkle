@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { connection } from "next/server";
 import Link from "next/link";
 import { logoutAction } from "./actions";
 
@@ -9,6 +10,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  await connection();
   const admin = await requireAdmin();
 
   return (

@@ -1,10 +1,12 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
+import { connection } from "next/server";
 
 export const instant = false;
 
 export default async function AdminDashboard() {
+  await connection();
   const admin = await requireAdmin();
 
   return (
