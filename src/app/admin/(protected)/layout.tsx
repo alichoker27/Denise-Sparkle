@@ -1,21 +1,10 @@
-import { Suspense } from "react";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import Link from "next/link";
 import { logoutAction } from "./actions";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-surface-soft" />}>
-      <AuthenticatedAdminLayout>{children}</AuthenticatedAdminLayout>
-    </Suspense>
-  );
-}
+export const instant = false;
 
-async function AuthenticatedAdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
