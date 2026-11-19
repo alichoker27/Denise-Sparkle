@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -11,6 +10,9 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  env: {
+    APP_URL: process.env.APP_URL || "http://localhost:3000",
   },
 };
 
