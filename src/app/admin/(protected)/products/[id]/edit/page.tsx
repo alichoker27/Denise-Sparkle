@@ -5,6 +5,8 @@ import { ProductForm } from "@/components/admin/ProductForm";
 import { db } from "@/lib/db";
 import { updateProductAction } from "../../actions";
 
+export const instant = false;
+
 export default async function EditProductPage({
   params,
 }: PageProps<"/admin/products/[id]/edit">) {

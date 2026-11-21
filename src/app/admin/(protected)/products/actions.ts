@@ -21,8 +21,6 @@ export async function createProductAction(formData: FormData) {
     benefits: formData.get("benefits") || null,
     ingredients: formData.get("ingredients") || null,
     priceCents: Math.round(Number(formData.get("price")) * 100),
-    isAvailable: formData.get("isAvailable") === "on",
-    isFeatured: formData.get("isFeatured") === "on",
     status: formData.get("status") || "DRAFT",
   });
 
@@ -88,8 +86,8 @@ export async function updateProductAction(id: number, formData: FormData) {
     benefits: formData.get("benefits") || null,
     ingredients: formData.get("ingredients") || null,
     priceCents: Math.round(Number(formData.get("price")) * 100),
-    isAvailable: formData.get("isAvailable") === "on",
-    isFeatured: formData.get("isFeatured") === "on",
+    isAvailable: existingRecord.isAvailable,
+    isFeatured: existingRecord.isFeatured,
     status: formData.get("status") || "DRAFT",
   });
 

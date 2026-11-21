@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Product, Category, ProductImage } from "@/generated/prisma/client";
 
@@ -57,16 +58,22 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
     setLoading(true);
     setError(null);
     if (imageUrl) formData.append("imageUrl", imageUrl);
-    
-    const result = await action(formData);
-    if (result?.error) {
-      setError(result.error);
+
+    try {
+      const result = await action(formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    } catch (submitError: unknown) {
+      console.error("Failed to save product:", submitError);
+      setError("We couldn't save this product. Please try again.");
+    } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6 max-w-2xl bg-white p-6 rounded-2xl border border-border shadow-sm">
+    <form action={handleSubmit} aria-busy={loading || uploading} className="space-y-6 max-w-2xl bg-white p-6 rounded-2xl border border-border shadow-sm">
       {error && <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">{error}</div>}
 
       <div>
@@ -112,29 +119,18 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Description</label>
+        <label className="block text-sm font-medium mb-1">Description <span className="font-normal text-ink-muted">(Optional)</span></label>
         <textarea name="description" defaultValue={initialData?.description || ""} rows={3} className="w-full px-4 py-2 rounded-xl border border-border" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Benefits</label>
+        <label className="block text-sm font-medium mb-1">Benefits <span className="font-normal text-ink-muted">(Optional)</span></label>
         <textarea name="benefits" defaultValue={initialData?.benefits || ""} rows={2} className="w-full px-4 py-2 rounded-xl border border-border" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Ingredients</label>
+        <label className="block text-sm font-medium mb-1">Ingredients <span className="font-normal text-ink-muted">(Optional)</span></label>
         <textarea name="ingredients" defaultValue={initialData?.ingredients || ""} rows={2} className="w-full px-4 py-2 rounded-xl border border-border" />
-      </div>
-
-      <div className="flex items-center gap-6">
-        <label className="flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" name="isAvailable" defaultChecked={initialData?.isAvailable ?? true} className="w-4 h-4 text-rose-500 rounded" />
-          Available for purchase
-        </label>
-        <label className="flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" name="isFeatured" defaultChecked={initialData?.isFeatured ?? false} className="w-4 h-4 text-rose-500 rounded" />
-          Feature on Homepage
-        </label>
       </div>
 
       <div>
@@ -146,8 +142,17 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
       </div>
 
       <div className="flex gap-4 pt-4 border-t border-border">
-        <Button type="submit" disabled={loading || uploading}>{loading ? "Saving..." : "Save Product"}</Button>
-        <Button type="button" variant="outline" onClick={() => router.push("/admin/products")}>Cancel</Button>
+        <Button type="submit" disabled={loading || uploading} aria-busy={loading}>
+          {loading ? (
+            <>
+              <LoaderCircle aria-hidden="true" size={18} className="mr-2 animate-spin" />
+              Saving product...
+            </>
+          ) : (
+            "Save Product"
+          )}
+        </Button>
+        <Button type="button" variant="outline" disabled={loading || uploading} onClick={() => router.push("/admin/products")}>Cancel</Button>
       </div>
     </form>
   );

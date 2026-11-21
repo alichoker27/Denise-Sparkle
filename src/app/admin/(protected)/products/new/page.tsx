@@ -4,6 +4,8 @@ import { ProductForm } from "@/components/admin/ProductForm";
 import { db } from "@/lib/db";
 import { createProductAction } from "../actions";
 
+export const instant = false;
+
 export default async function NewProductPage() {
   await connection();
 
