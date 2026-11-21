@@ -30,8 +30,16 @@ export function BundleForm({ products, action }: BundleFormProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setImageUrl(data.url);
-    } catch (err: any) {
-      setError(err.message);
+    } 
+    
+    
+    
+    
+  catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Image upload failed.");
+
+
+
     } finally {
       setUploading(false);
     }

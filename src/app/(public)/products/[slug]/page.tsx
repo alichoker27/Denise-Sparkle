@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, listPublishedProductsByCategory } from "@/lib/queries";
 import { formatPrice } from "@/lib/format";
 import { Container } from "@/components/layout/Container";
-import { Button } from "@/components/ui/Button";
+//import { Button } from "@/components/ui/Button";
 //import { ScentSelector } from "@/components/product/ScentSelector";
 import { ProductCard } from "@/components/product/ProductCard";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";

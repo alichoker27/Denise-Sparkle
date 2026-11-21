@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdminAction } from "@/lib/auth/require-admin";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { getAdminSession, SESSION_COOKIE_NAME, hashSessionToken } from "@/lib/auth/session";
+import {  SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { cookies } from "next/headers";
 import { firstPurchaseOfferInputSchema } from "@/lib/validation";
 import { DEFAULT_FIRST_PURCHASE_OFFER } from "@/lib/offer-defaults";

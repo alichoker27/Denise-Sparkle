@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
-import { SearchIcon, UserIcon, CartIcon, ChevronDownIcon } from "@/components/icons/Icons";
+import { SearchIcon, UserIcon, ChevronDownIcon } from "@/components/icons/Icons";
 import { CartIconClient } from "./CartIconClient";
 
 const navLinks = [
