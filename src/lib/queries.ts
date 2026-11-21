@@ -1,6 +1,7 @@
 import "server-only";
 import { connection } from "next/server";
 import { db } from "@/lib/db";
+import { DEFAULT_FIRST_PURCHASE_OFFER } from "@/lib/offer-defaults";
 
 // ---------- Categories ----------
 export async function listActiveCategories() {
@@ -118,7 +119,7 @@ export async function getActiveFirstPurchaseOffer() {
   // Required when cacheComponents:true is enabled in next.config.ts.
   await connection();
   const now = new Date();
-  return db.firstPurchaseOffer.findFirst({
+  const offer = await db.firstPurchaseOffer.findFirst({
     where: {
       isEnabled: true,
       OR: [{ startsAt: null }, { startsAt: { lte: now } }],
@@ -126,4 +127,9 @@ export async function getActiveFirstPurchaseOffer() {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  if (offer) return offer;
+
+  const configuredOfferCount = await db.firstPurchaseOffer.count();
+  return configuredOfferCount === 0 ? DEFAULT_FIRST_PURCHASE_OFFER : null;
 }

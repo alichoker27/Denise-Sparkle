@@ -1,12 +1,13 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdminAction } from "@/lib/auth/require-admin";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { getAdminSession, SESSION_COOKIE_NAME, hashSessionToken } from "@/lib/auth/session";
 import { cookies } from "next/headers";
+import { firstPurchaseOfferInputSchema } from "@/lib/validation";
+import { DEFAULT_FIRST_PURCHASE_OFFER } from "@/lib/offer-defaults";
 
 export async function updateNameAction(formData: FormData) {
   const admin = await requireAdminAction();
@@ -67,7 +68,20 @@ export async function updatePasswordAction(formData: FormData) {
 export async function updateOfferAction(formData: FormData) {
   await requireAdminAction();
   const isEnabled = formData.get("isEnabled") === "on";
-  const message = formData.get("message") as string;
+  const rawMessage = formData.get("message");
+  const parsedOffer = firstPurchaseOfferInputSchema.safeParse({
+    percentage: DEFAULT_FIRST_PURCHASE_OFFER.percentage,
+    message: typeof rawMessage === "string" ? rawMessage.trim() : "",
+    isEnabled,
+  });
+
+  if (!parsedOffer.success) {
+    return {
+      error: parsedOffer.error.issues[0]?.message ?? "Invalid offer settings.",
+    };
+  }
+
+  const { message } = parsedOffer.data;
 
   const existing = await db.firstPurchaseOffer.findFirst();
 

@@ -6,8 +6,9 @@ import { getProductBySlug, listPublishedProductsByCategory } from "@/lib/queries
 import { formatPrice } from "@/lib/format";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
-import { ScentSelector } from "@/components/product/ScentSelector";
+//import { ScentSelector } from "@/components/product/ScentSelector";
 import { ProductCard } from "@/components/product/ProductCard";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 // ─── Async data-fetching component (streams behind Suspense) ──────────────────
 
@@ -101,18 +102,11 @@ async function ProductDetailContent({
           )}
 
           {/* Scent Selector */}
-          <ScentSelector scents={scentNames} />
+          {/* <ScentSelector scents={scentNames} /> */}
 
           {/* Add to Cart Placeholder */}
           <div className="mt-10 pt-8 border-t border-border">
-            <Button 
-              size="lg" 
-              className="w-full text-lg shadow-hover opacity-50 cursor-not-allowed"
-              disabled
-              title="Cart coming in a later phase"
-            >
-              {product.isAvailable ? "ADD TO CART (Coming Soon)" : "SOLD OUT"}
-            </Button>
+           <AddToCartButton product={product} scents={scentNames} />
             <p className="text-xs text-center text-ink-muted mt-4">
               WhatsApp ordering will be available in the next phase.
             </p>

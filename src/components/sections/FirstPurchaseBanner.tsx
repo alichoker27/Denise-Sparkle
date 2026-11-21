@@ -1,6 +1,10 @@
 import { FirstPurchaseOffer } from "@/generated/prisma/client";
 
-export function FirstPurchaseBanner({ offer }: { offer: FirstPurchaseOffer | null }) {
+export function FirstPurchaseBanner({
+  offer,
+}: {
+  offer: Pick<FirstPurchaseOffer, "percentage" | "message" | "isEnabled"> | null;
+}) {
   if (!offer || !offer.isEnabled) return null;
 
   return (

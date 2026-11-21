@@ -57,6 +57,10 @@ export default function Home() {
       <Hero />
       <BenefitsStrip />
 
+      <Suspense fallback={null}>
+        <FirstPurchaseBannerSection />
+      </Suspense>
+
       <div className="container-site space-y-24">
 
         {/* Dynamic: streams in behind a Suspense boundary */}
@@ -68,11 +72,6 @@ export default function Home() {
           </div>
         }>
           <FeaturedProductsSection />
-        </Suspense>
-
-        {/* Dynamic: streams in behind a Suspense boundary */}
-        <Suspense fallback={null}>
-          <FirstPurchaseBannerSection />
         </Suspense>
 
         {/* Static: no dynamic data */}
