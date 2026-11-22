@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdminAction } from "@/lib/auth/require-admin";
 import { productInputSchema } from "@/lib/validation";
@@ -52,7 +51,7 @@ export async function createProductAction(formData: FormData) {
 
   revalidatePath("/admin/products");
   revalidatePath("/shop");
-  redirect("/admin/products");
+  return { success: true };
 }
 
 export async function updateProductAction(id: number, formData: FormData) {
@@ -125,7 +124,7 @@ export async function updateProductAction(id: number, formData: FormData) {
   revalidatePath("/shop");
   revalidatePath(`/products/${existingRecord.slug}`);
   revalidatePath(`/products/${parsed.data.slug}`);
-  redirect("/admin/products");
+  return { success: true };
 }
 
 export async function deleteProductAction(id: number) {

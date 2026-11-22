@@ -10,7 +10,7 @@ import { Product, Category, ProductImage } from "@/generated/prisma/client";
 interface ProductFormProps {
   categories: Category[];
   initialData?: (Product & { images?: ProductImage[] }) | null;
-  action: (formData: FormData) => Promise<{ error?: string } | void>;
+  action: (formData: FormData) => Promise<{ error?: string; success?: boolean }>;
 }
 
 export function ProductForm({ categories, initialData, action }: ProductFormProps) {
@@ -63,6 +63,8 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
       const result = await action(formData);
       if (result?.error) {
         setError(result.error);
+      } else if (result?.success) {
+        router.push("/admin/products");
       }
     } catch (submitError: unknown) {
       console.error("Failed to save product:", submitError);
