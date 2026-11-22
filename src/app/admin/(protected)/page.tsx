@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
-//import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { connection } from "next/server";
+import { PiPlusLight, PiShieldCheckLight } from "react-icons/pi";
 
 export const instant = false;
 
@@ -10,35 +10,53 @@ export default async function AdminDashboard() {
   const admin = await requireAdmin();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-display text-ink">Welcome back, {admin.name}</h1>
-        <p className="text-ink-muted mt-1">Here is a quick overview of your store.</p>
-      </div>
+    <div className="space-y-8">
+      <header>
+        <h1 className="text-3xl font-display leading-tight text-ink md:text-4xl">
+          Welcome back, {admin.name}
+        </h1>
+        <p className="mt-2 text-ink-muted">Here is a quick overview of your store.</p>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Stat Cards */}
-        <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
-          <p className="text-sm font-medium text-ink-muted mb-1">Total Products</p>
-          <p className="text-3xl font-display text-ink">--</p>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
-          <p className="text-sm font-medium text-ink-muted mb-1">Published Bundles</p>
-          <p className="text-3xl font-display text-ink">--</p>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
-          <p className="text-sm font-medium text-ink-muted mb-1">Active Sessions</p>
+      {/* Overview */}
+      <section
+        aria-label="Store overview"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6"
+      >
+        <div className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-ink-muted">Active sessions</p>
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blush-100 text-ink"
+              aria-hidden="true"
+            >
+              <PiShieldCheckLight className="h-5 w-5" />
+            </span>
+          </div>
           <p className="text-3xl font-display text-ink">1</p>
         </div>
-      </div>
+      </section>
 
-      <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
-        <h2 className="text-xl font-display text-ink mb-4">Quick Actions</h2>
-        <div className="flex flex-wrap gap-3">
-          <Button href="/admin/products/new">Add New Product</Button>
-          <Button href="/admin/bundles" variant="outline">Manage Bundles</Button>
+      {/* Quick Actions */}
+      <section
+        aria-labelledby="quick-actions"
+        className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6"
+      >
+        <h2 id="quick-actions" className="mb-5 text-xl font-display text-ink">
+          Quick actions
+        </h2>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Button href="/admin/products/new" className="w-full sm:w-auto">
+            <span className="inline-flex items-center justify-center gap-2">
+              <PiPlusLight className="h-4 w-4" aria-hidden="true" />
+              Add new product
+            </span>
+          </Button>
+          <Button href="/admin/bundles" variant="outline" className="w-full sm:w-auto">
+            Manage bundles
+          </Button>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

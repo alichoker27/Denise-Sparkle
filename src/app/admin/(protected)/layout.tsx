@@ -1,7 +1,10 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { connection } from "next/server";
 import Link from "next/link";
+import { PiSignOutLight, PiStorefrontLight } from "react-icons/pi";
 import { logoutAction } from "./actions";
+import { AdminNav } from "./AdminNav";
+import { AdminMobileBar } from "./AdminMobileBar";
 
 export const instant = false;
 
@@ -14,23 +17,37 @@ export default async function AdminLayout({
   const admin = await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-surface-soft flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white border-r border-border p-6 flex flex-col">
-        <div className="mb-8">
-          <h1 className="font-display text-xl text-ink">Admin Panel</h1>
-          <p className="text-xs text-ink-muted mt-1">Logged in as {admin.name}</p>
-        </div>
-        <nav className="flex flex-col gap-2 flex-1">
-          <Link href="/admin" className="text-sm font-medium text-ink-soft hover:text-ink p-2 rounded-lg hover:bg-blush-50 transition-colors">Dashboard</Link>
-          <Link href="/admin/products" className="text-sm font-medium text-ink-soft hover:text-ink p-2 rounded-lg hover:bg-blush-50 transition-colors">Products</Link>
-          <Link href="/admin/bundles" className="text-sm font-medium text-ink-soft hover:text-ink p-2 rounded-lg hover:bg-blush-50 transition-colors">Bundles</Link>
-          <Link href="/admin/settings" className="text-sm font-medium text-ink-soft hover:text-ink p-2 rounded-lg hover:bg-blush-50 transition-colors">Settings</Link>
-        </nav>
+    <div className="flex min-h-screen flex-col bg-surface-soft md:flex-row">
+      {/* Mobile: top bar with menu icon */}
+      <AdminMobileBar adminName={admin.name} logout={logoutAction} />
 
-        <div className="mt-auto pt-6 border-t border-border">
+      {/* Desktop: sidebar */}
+      <aside className="hidden border-r border-border bg-white p-6 md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0 md:flex-col md:overflow-y-auto">
+        <div className="mb-8">
+          <p className="font-display text-xl leading-none text-ink">Admin panel</p>
+          <p className="mt-1.5 truncate text-xs text-ink-muted">Logged in as {admin.name}</p>
+        </div>
+
+        <div className="flex-1">
+          <AdminNav />
+        </div>
+
+        <div className="mt-auto flex flex-col gap-1 border-t border-border pt-6">
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="focus-ring flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-blush-50 hover:text-ink"
+          >
+            <PiStorefrontLight className="h-5 w-5" aria-hidden="true" />
+            View store
+          </Link>
           <form action={logoutAction}>
-            <button type="submit" className="w-full text-left text-sm font-medium text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors">
+            <button
+              type="submit"
+              className="focus-ring flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+            >
+              <PiSignOutLight className="h-5 w-5" aria-hidden="true" />
               Log out
             </button>
           </form>
@@ -38,9 +55,7 @@ export default async function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-10">
-        {children}
-      </main>
+      <main className="min-w-0 flex-1 p-4 sm:p-6 md:p-10">{children}</main>
     </div>
   );
 }
