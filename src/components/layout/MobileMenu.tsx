@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { MenuIcon, CloseIcon } from "@/components/icons/Icons";
 
@@ -25,10 +26,14 @@ export function MobileMenu() {
   {isOpen ? <CloseIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
 </button>
 
-      {/* Slide-out Overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 top-[80px] z-40 bg-surface-soft/95 backdrop-blur-sm">
-          <nav className="flex flex-col p-6 space-y-4">
+      {isOpen && createPortal(
+        <div
+          className="fixed inset-x-0 bottom-0 top-20 z-[60] bg-surface-soft/95 backdrop-blur-sm"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setIsOpen(false);
+          }}
+        >
+          <nav id="mobile-menu" aria-label="Mobile navigation" className="flex flex-col space-y-4 p-6">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -40,7 +45,8 @@ export function MobileMenu() {
               </Link>
             ))}
           </nav>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
