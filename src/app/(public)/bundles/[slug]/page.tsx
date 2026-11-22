@@ -6,6 +6,7 @@ import { getBundleBySlug } from "@/lib/queries";
 import { formatPrice } from "@/lib/format";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
+import { AddBundleToCartButton } from "@/components/cart/AddBundleToCartButton";
 
 // 1. This is the main page component. It renders the static shell instantly.
 export default function BundleDetailPage({
@@ -114,17 +115,9 @@ async function BundleContent({ params }: { params: Promise<{ slug: string }> }) 
 
         {/* Add to Cart Placeholder */}
         <div className="mt-auto pt-6 border-t border-border">
-          <Button
-            size="lg"
-            className="w-full text-lg shadow-hover opacity-50 cursor-not-allowed"
-            disabled
-          >
-            ADD BUNDLE TO CART (Coming Soon)
-          </Button>
-          <p className="text-xs text-center text-ink-muted mt-4">
-            WhatsApp ordering will be available in the next phase.
-          </p>
-        </div>
+  <AddBundleToCartButton bundle={bundle} />
+  
+</div>
       </div>
     </div>
   );
