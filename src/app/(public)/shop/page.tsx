@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { PiMagnifyingGlassLight } from "react-icons/pi";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Container } from "@/components/layout/Container";
 import { listPublishedProducts, listActiveCategories } from "@/lib/queries";
 import { cn } from "@/lib/cn";
 
-// ─── Async data-fetching componentt (streams behind Suspense) ──────────────────
-// new sentence for the test
+const pillBase =
+  "whitespace-nowrap rounded-pill border px-6 py-2.5 text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-soft";
+const pillActive = "border-ink bg-ink text-white";
+const pillIdle = "border-border-strong bg-white text-ink-soft hover:border-ink hover:text-ink";
+
+// ─── Async data-fetching component (streams behind Suspense) ──────────────────
+
 async function ShopContent({
   searchParams,
 }: {
@@ -26,9 +32,7 @@ async function ShopContent({
   let filteredProducts = allProducts;
 
   if (activeCategory) {
-    filteredProducts = filteredProducts.filter(
-      (p) => p.category.slug === activeCategory
-    );
+    filteredProducts = filteredProducts.filter((p) => p.category.slug === activeCategory);
   }
 
   if (searchQuery) {
@@ -40,78 +44,115 @@ async function ShopContent({
     );
   }
 
+  const activeCategoryName = categories.find((c) => c.slug === activeCategory)?.name;
+  const count = filteredProducts.length;
+
   return (
     <Container>
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      {/* Header */}
+      <header className="mb-10 flex flex-col justify-between gap-8 md:mb-14 md:flex-row md:items-end">
         <div>
-          <h1 className="text-4xl md:text-5xl text-ink mb-4">Shop All</h1>
-          <p className="text-ink-soft max-w-xl">
+          <h1 className="mb-4 text-4xl font-display leading-tight text-ink md:text-6xl">
+            {activeCategoryName ?? "Shop all"}
+          </h1>
+          <p className="max-w-xl leading-relaxed text-ink-soft">
             Discover our full collection of natural, handcrafted beauty essentials.
           </p>
         </div>
 
-        {/* Search Bar */}
-        <form className="w-full md:w-72 relative" action="/shop" method="GET">
+        {/* Search */}
+        <form className="relative w-full md:w-80" action="/shop" method="GET" role="search">
           {activeCategory && <input type="hidden" name="category" value={activeCategory} />}
+          <label htmlFor="shop-search" className="sr-only">
+            Search products
+          </label>
           <input
+            id="shop-search"
             type="search"
             name="q"
             defaultValue={searchQuery}
-            placeholder="Search products..."
-            className="w-full rounded-pill border border-border-strong bg-white px-5 py-3 text-sm focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 transition-colors"
+            placeholder="Search products"
+            className="w-full rounded-pill border border-border-strong bg-white py-3 pl-5 pr-12 text-sm text-ink placeholder:text-ink-muted transition-colors focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
           />
-          <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-ink-muted hover:text-rose-500">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-            </svg>
+          <button
+            type="submit"
+            aria-label="Search"
+            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted transition-colors hover:text-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+          >
+            <PiMagnifyingGlassLight className="h-5 w-5" aria-hidden="true" />
           </button>
         </form>
-      </div>
+      </header>
 
-      {/* Categories Navigation */}
-      <div className="flex overflow-x-auto pb-4 mb-8 -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar gap-2">
-        <Link
-          href="/shop"
-          className={cn(
-            "whitespace-nowrap px-6 py-2.5 rounded-pill text-sm font-medium transition-colors border",
-            !activeCategory
-              ? "bg-ink text-white border-ink"
-              : "bg-white text-ink-soft border-border-strong hover:border-ink hover:text-ink"
-          )}
+      {/* Filters + result count */}
+      <div className="mb-10 border-b border-border/70 pb-6">
+        <nav
+          aria-label="Product categories"
+          className="hide-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0"
         >
-          All Products
-        </Link>
-        {categories.map((cat) => (
           <Link
-            key={cat.id}
-            href={`/shop?category=${cat.slug}${searchQuery ? `&q=${searchQuery}` : ""}`}
-            className={cn(
-              "whitespace-nowrap px-6 py-2.5 rounded-pill text-sm font-medium transition-colors border",
-              activeCategory === cat.slug
-                ? "bg-ink text-white border-ink"
-                : "bg-white text-ink-soft border-border-strong hover:border-ink hover:text-ink"
-            )}
+            href="/shop"
+            aria-current={!activeCategory ? "page" : undefined}
+            className={cn(pillBase, !activeCategory ? pillActive : pillIdle)}
           >
-            {cat.name}
+            All Products
           </Link>
-        ))}
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/shop?category=${cat.slug}${
+                searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : ""
+              }`}
+              aria-current={activeCategory === cat.slug ? "page" : undefined}
+              className={cn(pillBase, activeCategory === cat.slug ? pillActive : pillIdle)}
+            >
+              {cat.name}
+            </Link>
+          ))}
+        </nav>
+
+        <p className="mt-4 text-sm text-ink-muted" aria-live="polite">
+          {count} {count === 1 ? "product" : "products"}
+          {searchQuery && (
+            <>
+              {" "}
+              for &ldquo;{searchQuery}&rdquo;
+              <Link
+                href={activeCategory ? `/shop?category=${activeCategory}` : "/shop"}
+                className="ml-3 text-rose-500 underline-offset-4 hover:underline"
+              >
+                Clear search
+              </Link>
+            </>
+          )}
+        </p>
       </div>
 
       {/* Product Grid */}
-      {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {count > 0 ? (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-14 lg:grid-cols-3 xl:grid-cols-4">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
         /* Empty State */
-        <div className="text-center py-24 bg-white rounded-3xl border border-border">
-          <h2 className="text-2xl text-ink mb-2">No products found</h2>
-          <p className="text-ink-muted mb-6">
-            We could not find any products matching your search.
+        <div className="rounded-3xl border border-border bg-white px-6 py-20 text-center md:py-24">
+          <span
+            className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-blush-100 text-ink"
+            aria-hidden="true"
+          >
+            <PiMagnifyingGlassLight className="h-7 w-7" aria-hidden="true" />
+          </span>
+          <h2 className="mb-2 text-2xl font-display text-ink">No products found</h2>
+          <p className="mx-auto mb-8 max-w-sm text-sm leading-relaxed text-ink-muted">
+            We could not find any products matching your search. Try a different word or clear the
+            filters.
           </p>
-          <Link href="/shop" className="text-rose-500 font-medium hover:underline">
+          <Link
+            href="/shop"
+            className="inline-block rounded-pill border border-border-strong px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+          >
             Clear all filters
           </Link>
         </div>
@@ -125,21 +166,26 @@ async function ShopContent({
 function ShopSkeleton() {
   return (
     <Container>
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div className="mb-10 flex flex-col justify-between gap-8 md:mb-14 md:flex-row md:items-end">
         <div>
-          <div className="h-12 w-48 rounded-lg bg-blush-50 animate-pulse" />
-          <div className="h-5 w-72 rounded-lg bg-blush-50 animate-pulse mt-4" />
+          <div className="h-12 w-56 animate-pulse rounded-lg bg-blush-50" />
+          <div className="mt-4 h-5 w-72 animate-pulse rounded-lg bg-blush-50" />
         </div>
-        <div className="h-12 w-72 rounded-pill bg-blush-50 animate-pulse" />
+        <div className="h-12 w-full animate-pulse rounded-pill bg-blush-50 md:w-80" />
       </div>
-      <div className="flex gap-2 mb-8">
+      <div className="mb-10 flex gap-2 border-b border-border/70 pb-6">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-10 w-28 rounded-pill bg-blush-50 animate-pulse" />
+          <div key={i} className="h-10 w-28 animate-pulse rounded-pill bg-blush-50" />
         ))}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-14 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-72 rounded-2xl bg-blush-50 animate-pulse border border-border/30" />
+          <div key={i}>
+            <div className="aspect-[4/5] w-full animate-pulse rounded-2xl border border-border/30 bg-blush-50" />
+            <div className="mt-4 h-3 w-16 animate-pulse rounded bg-blush-50" />
+            <div className="mt-2 h-5 w-3/4 animate-pulse rounded bg-blush-50" />
+            <div className="mt-4 h-4 w-14 animate-pulse rounded bg-blush-50" />
+          </div>
         ))}
       </div>
     </Container>
@@ -154,7 +200,7 @@ export default function ShopPage({
   searchParams: Promise<{ category?: string; q?: string }>;
 }) {
   return (
-    <main className="py-12 bg-surface-soft min-h-screen">
+    <main className="min-h-screen bg-surface-soft py-12 md:py-16">
       <Suspense fallback={<ShopSkeleton />}>
         <ShopContent searchParams={searchParams} />
       </Suspense>
