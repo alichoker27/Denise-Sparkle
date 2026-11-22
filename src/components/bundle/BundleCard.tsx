@@ -1,59 +1,68 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PiArrowRightLight, PiGiftLight } from "react-icons/pi";
+import { cn } from "@/lib/cn";
 import { formatPrice } from "@/lib/format";
 import { BundleWithItems } from "@/types";
 
 interface BundleCardProps {
   bundle: BundleWithItems;
+  /** Mirrors the layout (image on the right) on md+ screens. Presentation only. */
+  reverse?: boolean;
 }
 
-export function BundleCard({ bundle }: BundleCardProps) {
+export function BundleCard({ bundle, reverse = false }: BundleCardProps) {
   return (
-    <Link 
+    <Link
       href={`/bundles/${bundle.slug}`}
-      className="group flex flex-col md:flex-row bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-card transition-all border border-border/50"
+      className={cn(
+        "group flex flex-col overflow-hidden rounded-3xl border border-border/50 bg-white shadow-sm transition-shadow duration-500 hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-4 focus-visible:ring-offset-surface-soft md:flex-row",
+        reverse && "md:flex-row-reverse"
+      )}
     >
-      {/* Image Side */}
-      <div className="relative w-full md:w-1/2 aspect-square md:aspect-auto md:h-full bg-blush-50">
+      {/* Image side */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-blush-50 sm:aspect-[16/10] md:aspect-auto md:min-h-[24rem] md:w-1/2">
         {bundle.imageUrl ? (
           <Image
             src={bundle.imageUrl}
             alt={bundle.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(min-width: 1024px) 40vw, (min-width: 768px) 45vw, 100vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-ink-muted bg-blush-100">
-            {/* Placeholder icon if no image */}
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12 mb-2 opacity-50">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-            </svg>
-            <span className="text-sm">Image Coming Soon</span>
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-blush-100 text-ink-muted"
+            aria-hidden="true"
+          >
+            <PiGiftLight className="h-14 w-14 opacity-50" />
           </div>
         )}
       </div>
 
-      {/* Details Side */}
-      <div className="flex flex-col p-8 md:w-1/2 justify-center">
-        <span className="text-xs font-bold text-blush-500 tracking-widest uppercase mb-2">
-          Exclusive Bundle
-        </span>
-        <h3 className="font-display text-2xl md:text-3xl text-ink leading-tight mb-3 group-hover:text-rose-500 transition-colors">
+      {/* Details side */}
+      <div className="flex flex-col justify-center p-6 sm:p-8 md:w-1/2 lg:p-12">
+        <p className="mb-3 text-sm text-ink-muted">Exclusive bundle</p>
+        <h3 className="mb-4 text-2xl font-display leading-tight text-ink transition-colors duration-300 group-hover:text-rose-500 md:text-3xl">
           {bundle.name}
         </h3>
-        
+
         {bundle.description && (
-          <p className="text-ink-soft text-sm mb-6 line-clamp-2">
+          <p className="mb-8 line-clamp-3 text-sm leading-relaxed text-ink-soft md:text-base">
             {bundle.description}
           </p>
         )}
 
-        <div className="mt-auto flex items-center justify-between border-t border-border/50 pt-4">
-          <span className="font-semibold text-ink text-xl">
+        <div className="mt-auto flex items-center justify-between gap-4 border-t border-border/60 pt-5">
+          <span className="text-xl font-medium text-ink md:text-2xl">
             {formatPrice(bundle.priceCents)}
           </span>
-          <span className="text-xs text-rose-500 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-            View Bundle <span aria-hidden="true">&rarr;</span>
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-rose-500">
+            View bundle
+            <PiArrowRightLight
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+              aria-hidden="true"
+            />
           </span>
         </div>
       </div>

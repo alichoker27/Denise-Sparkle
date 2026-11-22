@@ -1,67 +1,102 @@
+import { Suspense } from "react";
+import Link from "next/link";
+import { PiGiftLight } from "react-icons/pi";
 import { listPublishedBundles } from "@/lib/queries";
 import { Container } from "@/components/layout/Container";
 import { BundleCard } from "@/components/bundle/BundleCard";
-import { Suspense } from "react";
 
 export const metadata = {
   title: "Collections & Bundles",
   description: "Discover our curated sets of natural beauty essentials.",
 };
 
-// ─── Async data‑fetching component ────────────────────────────────────────
+// ─── Async data-fetching component ────────────────────────────────────────────
+
 async function CollectionsContent() {
   const bundles = await listPublishedBundles();
 
   return (
-    <>
-      <div className="text-center max-w-2xl mx-auto mb-16">
-        <h1 className="text-4xl md:text-5xl text-ink mb-4 font-display">Our Collections</h1>
-        <p className="text-ink-soft">
-          Save more when you bundle. Curated sets of our most‑loved products, designed to work perfectly together.
+    <Container>
+      <header className="mx-auto mb-12 max-w-2xl text-center md:mb-20">
+        <h1 className="mb-5 text-4xl font-display leading-tight text-ink md:text-6xl">
+          Our Collections
+        </h1>
+        <div className="mx-auto mb-5 h-px w-12 bg-border-strong" aria-hidden="true" />
+        <p className="leading-relaxed text-ink-soft">
+          Save more when you bundle. Curated sets of our most-loved products, designed to work
+          perfectly together.
         </p>
-      </div>
+      </header>
 
       {bundles.length > 0 ? (
-        <div className="grid grid-cols-1 gap-8">
-          {bundles.map((bundle) => (
-            <BundleCard key={bundle.id} bundle={bundle} />
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:gap-12">
+          {bundles.map((bundle, i) => (
+            <BundleCard key={bundle.id} bundle={bundle} reverse={i % 2 === 1} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white rounded-3xl border border-border">
-          <h2 className="text-2xl text-ink mb-2">No bundles available yet</h2>
-          <p className="text-ink-muted">Check back soon for our curated collections.</p>
+        <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-white px-6 py-20 text-center md:py-24">
+          <span
+            className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-blush-100 text-ink"
+            aria-hidden="true"
+          >
+            <PiGiftLight className="h-7 w-7" />
+          </span>
+          <h2 className="mb-2 text-2xl font-display text-ink">No bundles available yet</h2>
+          <p className="mb-8 text-sm leading-relaxed text-ink-muted">
+            Check back soon for our curated collections. In the meantime, you can browse every
+            product on its own.
+          </p>
+          <Link
+            href="/shop"
+            className="inline-block rounded-pill border border-border-strong px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+          >
+            Browse the shop
+          </Link>
         </div>
       )}
-    </>
+    </Container>
   );
 }
 
-// ─── Loading skeleton ───────────────────────────────────────────────────
+// ─── Loading skeleton ─────────────────────────────────────────────────────────
+
 function CollectionsSkeleton() {
   return (
     <Container>
-      <div className="h-8 w-48 rounded bg-blush-50 animate-pulse mb-8" />
-      <div className="space-y-4">
-        <div className="h-4 w-3/4 rounded bg-blush-50 animate-pulse" />
-        <div className="h-4 w-1/2 rounded bg-blush-50 animate-pulse" />
+      <div className="mx-auto mb-12 max-w-2xl text-center md:mb-20">
+        <div className="mx-auto h-12 w-64 animate-pulse rounded-lg bg-blush-50" />
+        <div className="mx-auto mt-6 h-4 w-3/4 animate-pulse rounded bg-blush-50" />
+        <div className="mx-auto mt-3 h-4 w-1/2 animate-pulse rounded bg-blush-50" />
       </div>
-      <div className="mt-8 grid grid-cols-1 gap-8">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-40 rounded bg-blush-50 animate-pulse" />
+      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:gap-12">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col overflow-hidden rounded-3xl border border-border/30 bg-white md:flex-row"
+          >
+            <div className="aspect-[4/3] w-full animate-pulse bg-blush-50 sm:aspect-[16/10] md:aspect-auto md:min-h-[24rem] md:w-1/2" />
+            <div className="space-y-4 p-6 sm:p-8 md:w-1/2 lg:p-12">
+              <div className="h-4 w-24 animate-pulse rounded bg-blush-50" />
+              <div className="h-8 w-3/4 animate-pulse rounded bg-blush-50" />
+              <div className="h-4 w-full animate-pulse rounded bg-blush-50" />
+              <div className="h-4 w-2/3 animate-pulse rounded bg-blush-50" />
+            </div>
+          </div>
         ))}
       </div>
     </Container>
   );
 }
 
-// ─── Page (sync) ────────────────────────────────────────────────────────
+// ─── Page (sync) ──────────────────────────────────────────────────────────────
+
 export default function CollectionsPage() {
   return (
-    <main className="py-12 md:py-20 bg-surface-soft min-h-screen">
+    <main className="min-h-screen bg-surface-soft py-12 md:py-20">
       <Suspense fallback={<CollectionsSkeleton />}>
         <CollectionsContent />
       </Suspense>
     </main>
   );
-}
+}
