@@ -39,12 +39,8 @@ export function Header() {
 
         {/* Right: Icons & Mobile Toggle */}
         <div className="flex-1 flex items-center justify-end gap-4">
-          <button aria-label="Search" className="p-2 text-ink hover:text-rose-500 transition-colors focus-ring rounded-full hidden sm:block">
-            <SearchIcon className="w-5 h-5" />
-          </button>
-          <button aria-label="Account" className="p-2 text-ink hover:text-rose-500 transition-colors focus-ring rounded-full hidden sm:block">
-            <UserIcon className="w-5 h-5" />
-          </button>
+          
+          
           
           <CartIconClient />
 

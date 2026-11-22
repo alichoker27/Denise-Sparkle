@@ -18,7 +18,7 @@ export function FirstPurchaseBanner({
           {offer.message}
         </h2>
         <p className="text-ink-soft">
-          Select your favorites and order via WhatsApp. Denise will manually confirm your eligibility before payment.
+          Select your favorites and order via WhatsApp.
         </p>
       </div>
     </div>
