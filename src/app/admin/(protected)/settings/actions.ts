@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdminAction } from "@/lib/auth/require-admin";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import {  SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { hashSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { cookies } from "next/headers";
 import { firstPurchaseOfferInputSchema } from "@/lib/validation";
 import { DEFAULT_FIRST_PURCHASE_OFFER } from "@/lib/offer-defaults";
@@ -46,23 +46,26 @@ export async function updatePasswordAction(formData: FormData) {
   }
 
   const newHash = await hashPassword(newPassword);
+  const cookieStore = await cookies();
+  const currentSessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+
+  if (!currentSessionToken) {
+    return { error: "Your session has expired. Please sign in again." };
+  }
 
   await db.$transaction(async (tx) => {
     await tx.adminUser.update({
       where: { id: admin.id },
       data: { passwordHash: newHash },
     });
-    // Revoke all other sessions for security
     await tx.adminSession.deleteMany({
-      where: { userId: admin.id },
+      where: {
+        userId: admin.id,
+        tokenHash: { not: hashSessionToken(currentSessionToken) },
+      },
     });
   });
-
-  // Delete the current cookie so she has to log in again
-  const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
-  
-  return { success: "Password updated. Please log in again." };
+  return { success: "Password updated. Other active sessions have been signed out." };
 }
 
 export async function updateOfferAction(formData: FormData) {
