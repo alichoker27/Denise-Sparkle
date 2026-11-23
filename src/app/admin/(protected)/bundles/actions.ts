@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireAdminAction } from "@/lib/auth/require-admin";
 import { bundleInputSchema } from "@/lib/validation";
@@ -11,7 +10,15 @@ export async function createBundleAction(formData: FormData) {
   await requireAdminAction();
   
   const imageUrl = formData.get("imageUrl") as string | null;
-  const rawItems = JSON.parse(formData.get("items") as string || "[]");
+  const rawItemsValue = formData.get("items");
+  let rawItems: unknown = [];
+  if (typeof rawItemsValue === "string") {
+    try {
+      rawItems = JSON.parse(rawItemsValue);
+    } catch {
+      return { error: "Invalid product selection." };
+    }
+  }
   const name = formData.get("name");
   
   const parsed = bundleInputSchema.safeParse({
@@ -25,6 +32,11 @@ export async function createBundleAction(formData: FormData) {
   });
 
   if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const itemSlugs = parsed.data.items.map((item) => item.productSlug);
+  if (new Set(itemSlugs).size !== itemSlugs.length) {
+    return { error: "Add each product only once to this bundle." };
+  }
 
   const existingBundle = await db.bundle.findUnique({
     where: { slug: parsed.data.slug },
@@ -63,7 +75,7 @@ export async function createBundleAction(formData: FormData) {
 
   revalidatePath("/admin/bundles");
   revalidatePath("/collections");
-  redirect("/admin/bundles");
+  return { success: true };
 }
 
 export async function deleteBundleAction(id: number) {
