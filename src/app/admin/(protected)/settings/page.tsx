@@ -12,8 +12,13 @@ export default async function SettingsPage() {
   const offer = await db.firstPurchaseOffer.findFirst();
 
   return (
-    <div>
-      <h1 className="text-2xl font-display text-ink mb-6">Settings</h1>
+    <div className="space-y-8">
+      <header>
+        <h1 className="text-3xl font-display leading-tight text-ink md:text-4xl">Settings</h1>
+        <p className="mt-2 text-sm text-ink-muted">
+          Manage your profile, the homepage offer and your password.
+        </p>
+      </header>
       <SettingsClient admin={admin} offer={offer} />
     </div>
   );
