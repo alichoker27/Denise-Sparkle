@@ -191,16 +191,7 @@ export default function BundlesClient({
                 </p>
 
                 <div className="mt-4 flex gap-3 border-t border-border pt-4">
-                  <Link
-                    href={`/admin/bundles/${bundle.id}/edit`}
-                    className="focus-ring inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-pill border border-border-strong px-4 text-sm font-medium text-rose-500 transition-colors hover:bg-blush-50 hover:text-rose-600"
-                  >
-                    <PiPencilSimpleLight
-                      className="h-4 w-4"
-                      aria-hidden="true"
-                    />
-                    Edit
-                  </Link>
+                 
                   <button
                     type="button"
                     onClick={(event) => openDeleteDialog(event, bundle)}
