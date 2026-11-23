@@ -19,7 +19,7 @@ export function Footer() {
               DENISE SPARKLE
             </Link>
             <div className="flex gap-4 mt-1">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-ink-muted hover:text-rose-500 transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/denise_sparkle_?lqvp=c2w4OG9sd2lndTFu" target="_blank" rel="noreferrer" className="text-ink-muted hover:text-rose-500 transition-colors" aria-label="Instagram">
                 <FaInstagram size={18} />
               </a>
               
