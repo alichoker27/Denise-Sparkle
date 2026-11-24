@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { PiCircleNotchLight, PiImageLight, PiUploadSimpleLight } from "react-icons/pi";
 import { Button } from "@/components/ui/Button";
-import { Product, Category, ProductImage } from "@/generated/prisma/client";
+import { Product, Category, ProductImage, Scent } from "@/generated/prisma/client";
 
 interface ProductFormProps {
   categories: Category[];
-  initialData?: (Product & { images?: ProductImage[] }) | null;
+  allScents: Scent[];
+  initialData?: (Product & { images?: ProductImage[]; scents?: { scentId: number }[] }) | null;
   action: (formData: FormData) => Promise<{ error?: string; success?: boolean }>;
 }
 
@@ -22,12 +23,24 @@ function Optional() {
   return <span className="font-normal text-ink-muted"> (optional)</span>;
 }
 
-export function ProductForm({ categories, initialData, action }: ProductFormProps) {
+export function ProductForm({ categories, allScents, initialData, action }: ProductFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(initialData?.images?.[0]?.url || null);
   const [uploading, setUploading] = useState(false);
+  
+  // Track selected scents for the UI
+  const [selectedScents, setSelectedScents] = useState<number[]>(
+    initialData?.scents?.map((s) => s.scentId) || []
+  );
+
   const router = useRouter();
+
+  function toggleScent(id: number) {
+    setSelectedScents((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -91,7 +104,6 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
         </div>
       )}
 
-      {/* Landscape on large screens: [ image | details ] over a full-width publish bar */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
         {/* Image */}
         <section aria-labelledby="image-heading" className={`${cardClass} lg:col-span-4 lg:self-start`}>
@@ -217,6 +229,32 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
             />
           </div>
 
+          {/* NEW: Scents Section */}
+          <div>
+            <label className={labelClass}>
+              Available Scents
+              <Optional />
+            </label>
+            <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {allScents.map((scent) => (
+                <label key={scent.id} className="flex cursor-pointer items-center gap-2 text-sm text-ink">
+                  <input
+                    type="checkbox"
+                    name="scentIds"
+                    value={scent.id}
+                    checked={selectedScents.includes(scent.id)}
+                    onChange={() => toggleScent(scent.id)}
+                    className="h-4 w-4 rounded border-border-strong text-rose-500 focus:ring-rose-500"
+                  />
+                  {scent.name}
+                </label>
+              ))}
+              {allScents.length === 0 && (
+                <p className="col-span-full text-sm text-ink-muted">No scents created yet.</p>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor="benefits" className={labelClass}>
@@ -247,7 +285,7 @@ export function ProductForm({ categories, initialData, action }: ProductFormProp
           </div>
         </section>
 
-        {/* Publish: a horizontal action bar on larger screens */}
+        {/* Publish */}
         <section aria-labelledby="publish-heading" className={`${cardClass} lg:col-span-12`}>
           <h2 id="publish-heading" className="mb-4 text-lg font-display text-ink">
             Publish

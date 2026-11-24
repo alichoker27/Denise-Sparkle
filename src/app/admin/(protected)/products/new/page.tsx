@@ -11,15 +11,17 @@ export const instant = false;
 export default async function NewProductPage() {
   await connection();
 
-  const categories = await db.category.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
+  const [categories, allScents] = await Promise.all([
+    db.category.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+    }),
+    db.scent.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   return (
     <div className="space-y-8">
       <header className="flex max-w-7xl flex-col gap-6 border-b border-border pb-8 sm:flex-row sm:items-start sm:justify-between">
-        {/* Brand: first on small screens, right-aligned on larger ones */}
         <div className="sm:order-2">
           <Logo />
         </div>
@@ -41,7 +43,7 @@ export default async function NewProductPage() {
         </div>
       </header>
 
-      <ProductForm categories={categories} action={createProductAction} />
+      <ProductForm categories={categories} allScents={allScents} action={createProductAction} />
     </div>
   );
 }

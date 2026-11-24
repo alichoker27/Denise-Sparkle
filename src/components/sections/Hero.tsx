@@ -16,6 +16,7 @@ export function Hero() {
           fill
           priority
           className="object-cover object-right lg:object-center"
+          loading="eager"
         />
         {/* Optional: Subtle gradient to ensure text is readable over the left side of the image */}
         <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-white/30 to-transparent" />

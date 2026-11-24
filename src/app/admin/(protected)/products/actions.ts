@@ -11,6 +11,7 @@ export async function createProductAction(formData: FormData) {
   const imageUrlValue = formData.get("imageUrl");
   const imageUrl = typeof imageUrlValue === "string" ? imageUrlValue : null;
   const name = formData.get("name");
+  const scentIdsStr = formData.getAll("scentIds"); // Extract scents
   
   const parsed = productInputSchema.safeParse({
     categorySlug: formData.get("categorySlug"),
@@ -47,6 +48,17 @@ export async function createProductAction(formData: FormData) {
         data: { productId: product.id, url: imageUrl, isPrimary: true },
       });
     }
+
+    // Insert Scents if any were selected
+    if (scentIdsStr.length > 0) {
+      await tx.productScent.createMany({
+        data: scentIdsStr.map(id => ({
+          productId: product.id,
+          scentId: Number(id)
+        })),
+        skipDuplicates: true,
+      });
+    }
   });
 
   revalidatePath("/admin/products");
@@ -58,6 +70,8 @@ export async function updateProductAction(id: number, formData: FormData) {
   await requireAdminAction();
   const imageUrlValue = formData.get("imageUrl");
   const imageUrl = typeof imageUrlValue === "string" ? imageUrlValue : null;
+  const scentIdsStr = formData.getAll("scentIds"); // Extract scents
+  
   const existingRecord = await db.product.findUnique({
     where: { id },
     include: {
@@ -75,12 +89,7 @@ export async function updateProductAction(id: number, formData: FormData) {
   const parsed = productInputSchema.safeParse({
     categorySlug: formData.get("categorySlug"),
     name,
-    slug:
-      typeof name === "string"
-        ? name === existingRecord.name
-          ? existingRecord.slug
-          : slugify(name)
-        : "",
+    slug: typeof name === "string" ? (name === existingRecord.name ? existingRecord.slug : slugify(name)) : "",
     description: formData.get("description") || null,
     benefits: formData.get("benefits") || null,
     ingredients: formData.get("ingredients") || null,
@@ -111,11 +120,19 @@ export async function updateProductAction(id: number, formData: FormData) {
     });
 
     if (imageUrl && imageUrl !== existingRecord.images[0]?.url) {
-      await tx.productImage.deleteMany({
-        where: { productId: id, isPrimary: true },
-      });
-      await tx.productImage.create({
-        data: { productId: id, url: imageUrl, isPrimary: true },
+      await tx.productImage.deleteMany({ where: { productId: id, isPrimary: true } });
+      await tx.productImage.create({ data: { productId: id, url: imageUrl, isPrimary: true } });
+    }
+
+    // Update Scents: Delete old ones, create new ones
+    await tx.productScent.deleteMany({ where: { productId: id } });
+    if (scentIdsStr.length > 0) {
+      await tx.productScent.createMany({
+        data: scentIdsStr.map(scentId => ({
+          productId: id,
+          scentId: Number(scentId)
+        })),
+        skipDuplicates: true,
       });
     }
   });

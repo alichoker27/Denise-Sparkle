@@ -25,18 +25,22 @@ export default async function EditProductPage({
         where: { isPrimary: true },
         orderBy: { sortOrder: "asc" },
       },
+      scents: { select: { scentId: true } }, // Fetch currently assigned scents
     },
   });
   if (!product) {
     notFound();
   }
 
-  const categories = await db.category.findMany({
-    where: {
-      OR: [{ isActive: true }, { id: product.categoryId }],
-    },
-    orderBy: { sortOrder: "asc" },
-  });
+  const [categories, allScents] = await Promise.all([
+    db.category.findMany({
+      where: {
+        OR: [{ isActive: true }, { id: product.categoryId }],
+      },
+      orderBy: { sortOrder: "asc" },
+    }),
+    db.scent.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   const updateAction = updateProductAction.bind(null, product.id);
 
@@ -53,6 +57,7 @@ export default async function EditProductPage({
       </div>
       <ProductForm
         categories={categories}
+        allScents={allScents}
         initialData={product}
         action={updateAction}
       />
