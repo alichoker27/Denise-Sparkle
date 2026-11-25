@@ -8,6 +8,7 @@ import {
   PiGiftLight,
   PiPackageLight,
   PiSquaresFourLight,
+  PiTagLight ,
   PiDropLight // <-- Use this for Scents
 } from "react-icons/pi";
 import { cn } from "@/lib/cn";
@@ -18,6 +19,7 @@ const items: { href: string; label: string; icon: IconType; exact?: boolean }[] 
   { href: "/admin/bundles", label: "Bundles", icon: PiGiftLight },
   { href: "/admin/settings", label: "Settings", icon: PiGearSixLight },
   { href: "/admin/scents", label: "Scents", icon: PiDropLight },
+  { href: "/admin/categories", label: "Categories", icon: PiTagLight },
 ];
 
 export function AdminNav({ onNavigate }: { onNavigate?: () => void }) {
