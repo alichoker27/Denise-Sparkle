@@ -95,9 +95,7 @@ async function ProductDetailContent({
           {/* Scent selection + add to cart */}
           <div className="border-t border-border pt-8">
             <AddToCartButton product={product} scents={scentNames} />
-            <p className="mt-4 text-center text-xs text-ink-muted">
-              WhatsApp ordering will be available in the next phase.
-            </p>
+            
 
             <ul className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-ink-soft">
               <li className="inline-flex items-center gap-2">
